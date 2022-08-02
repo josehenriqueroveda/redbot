@@ -115,12 +115,15 @@ def build_report():
     if files:
         today = date.today().strftime("%d-%m-%Y")
         df = pd.read_csv('DESTINATION_DIRECTORY/issues.csv',
-                         usecols=['Project', 'Subject','Status', 'Assignee', 'Due date'])
+                         usecols=['Project', 'Subject', 'Description', 'Status', 'Assignee', 'Due date'])
         df = df[df['Assignee'] == 'YOUR_NAME']
         df = df[df['Status'] != 'New']
-        df['Project'] = df['Project'] + ': ' + df['Subject']
+        df['Project'] = df['Project'] + ': ' + df['Subject'] + ' - ' + df['Description']
         del df['Subject']
+        del df['Description']
         df.columns = ['Task', 'Status', 'Responsible', 'Due Date']
+        df['Due Date'] = pd.to_datetime(df['Due Date'])
+        df['Due Date'] = df['Due Date'].apply(lambda x: x.strftime("%d-%m-%Y"))
         df = df.sort_values(by=['Task'])
         df.to_excel(
             f'DESTINATION_DIRECTORY/Weekly_Report_{today}.xlsx', encoding='utf-8', index=False)
